@@ -9,10 +9,13 @@
           alt="cronologic Logo"
           class="shrink mt-1"
           contain
-          min-width="150"
           src="@/assets/cronologic_logo_2020.png"
           width="100"
         />
+      </div>
+
+      <div class="d-flex align-center ml-8">
+        <v-toolbar-title>WebUSB</v-toolbar-title>
       </div>
 
       <v-spacer></v-spacer>
