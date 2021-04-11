@@ -7,7 +7,7 @@
       <div class="d-flex align-center">
         <v-img
           alt="cronologic Logo"
-          class="shrink mt-1 hidden-sm-and-down"
+          class="shrink mt-1"
           contain
           min-width="150"
           src="@/assets/cronologic_logo_2020.png"
