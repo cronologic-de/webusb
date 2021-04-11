@@ -1,5 +1,8 @@
 # webusb-frontend
 
+This is the frontend for the [cronologic WebUSB project](https://github.com/cronologic-de/webusb).
+It’s based on Vue.js 2 and Vuetify.
+
 ## Project setup
 ```
 npm install
