@@ -2,7 +2,7 @@
   <v-app>
     <v-app-bar
       app
-      color="#f0f0f0"
+      class="cronologic-app-bar"
     >
       <div class="d-flex align-center">
         <v-img
@@ -48,3 +48,10 @@ export default {
   }),
 };
 </script>
+
+<style lang="scss">
+.cronologic-app-bar {
+  background-image: url('./assets/cronologic_background.gif');
+  background-repeat: repeat;
+}
+</style>
