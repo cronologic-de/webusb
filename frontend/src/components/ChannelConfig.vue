@@ -21,6 +21,8 @@
                 label="Numerator"
                 type="number"
                 class="no-spinbox"
+                v-model="num"
+                :rules="num_rules"
               />
             </v-col>
             <v-col>
@@ -28,6 +30,8 @@
                 label="Denominator"
                 type="number"
                 class="no-spinbox"
+                v-model="denom"
+                :rules="denom_rules"
               />
             </v-col>
           </v-row>
@@ -43,6 +47,8 @@
                 type="number"
                 suffix="ns"
                 class="no-spinbox"
+                v-model="phase_ns"
+                :rules="phase_rules"
               />
             </v-col>
             <v-col>
@@ -51,6 +57,8 @@
                 type="number"
                 suffix="ns"
                 class="no-spinbox"
+                v-model="width_ns"
+                :rules="width_rules"
               />
             </v-col>
           </v-row>
@@ -61,11 +69,65 @@
 </template>
 
 <script>
+  function maxLength(max) {
+    return (v => String(v).length <= max || `${max} digit${max===1?'':'s'} max`);
+  }
+
+  function maxFrac(max) {
+    return v => {
+      v = String(v).split('.', 2);
+      if (v.length === 2 && v[1].length > max) {
+        return `${max} fractional digits max`;
+      }
+      return true;
+    }
+  }
+
+  function posIntNot0(v) {
+    if (!(String(v).match(/^[0-9]+$/))) {
+      return 'only positive integers';
+    }
+    if (String(v) === '0') {
+      return 'cannot be zero';
+    }
+    return true;
+  }
+
+  function posFloat(v) {
+    return !!(String(v).match(/^[0-9.]+$/)) || 'only positive numbers';
+  }
+
   export default {
     name: 'ChannelConfig',
 
-    data: () => ({
-    }),
+    data() {
+      return {
+        num: this.numerator,
+        denom: this.denominator,
+        phase_ns: this.phase,
+        width_ns: this.width,
+        num_rules: [ posIntNot0, maxLength(2) ],
+        denom_rules: [ posIntNot0, maxLength(1) ],
+        phase_rules: [
+          posFloat,
+          maxFrac(5),
+          v => {
+            v = parseFloat(v);
+            if ((v * 1_000_000) % 250 !== 0) {
+              return 'only multiples of 250 fs';
+            }
+            if (v > 1_000_000) {
+              return 'max 1 ms';
+            }
+            return true;
+          },
+        ],
+        width_rules: [
+          posFloat,
+          maxFrac(3),
+        ],
+      };
+    },
 
     props: {
       color: {
@@ -79,7 +141,23 @@
       id: {
         type: Number,
         required: true,
-      }
+      },
+      numerator: {
+        type: Number,
+        default: 1,
+      },
+      denominator: {
+        type: Number,
+        default: 1,
+      },
+      phase: {
+        type: Number,
+        default: 123.45625,
+      },
+      width: {
+        type: Number,
+        default: 123.456,
+      },
     },
   }
 </script>
