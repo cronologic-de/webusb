@@ -58,6 +58,15 @@
           </v-col>
         </v-row>
       </v-container>
+
+      <v-snackbar
+        v-model="connectionFakeNotification"
+        :timeout="5000"
+      >
+        <v-icon color="light-blue">mdi-information</v-icon>
+        The “connect” toggle is currently just a mockup.
+        No USB connection is made.
+      </v-snackbar>
     </v-main>
   </v-app>
 </template>
@@ -106,6 +115,7 @@ export default {
         color: 'purple',
       },
     ],
+    connectionFakeNotification: false,
     deviceState: DEVICE_DISABLED,
   }),
   computed: {
@@ -120,6 +130,7 @@ export default {
         if (val) {  // Request to enable.
           if (this.deviceState == this.DEVICE_DISABLED) {
             this.deviceState = this.DEVICE_CONNECTING;
+            this.connectionFakeNotification = true;
             setTimeout(() => {
               if (this.deviceState === this.DEVICE_CONNECTING) {
                 this.deviceState = this.DEVICE_CONNECTED;
