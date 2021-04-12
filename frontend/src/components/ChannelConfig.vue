@@ -1,6 +1,7 @@
 <template>
   <v-card
     outlined
+    :disabled="disabled"
   >
     <v-card-title
       :class="color + ' lighten-4'"
@@ -70,6 +71,10 @@
       color: {
         type: String,
         default: 'grey',
+      },
+      disabled: {
+        type: Boolean,
+        default: false,
       },
       id: {
         type: Number,

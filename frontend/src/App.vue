@@ -20,14 +20,15 @@
 
       <v-spacer></v-spacer>
 
-      <v-btn
-        href="https://github.com/cronologic-de/webusb"
-        target="_blank"
-        text
-      >
-        <span class="mr-2">Project Page</span>
-        <v-icon>mdi-open-in-new</v-icon>
-      </v-btn>
+      <div class="d-flex align-center">
+        <v-switch
+          append-icon="mdi-usb"
+          :color="deviceState === DEVICE_CONNECTING ? 'warning' : 'success'"
+          hide-details
+          :loading="deviceState === DEVICE_CONNECTING"
+          v-model="deviceToggle"
+        />
+      </div>
     </v-app-bar>
 
     <v-main>
@@ -38,7 +39,9 @@
             sm="6" offset-sm="3"
             md="4" offset-md="4"
           >
-            <ClockConfig />
+            <ClockConfig
+              :disabled="!connected"
+            />
           </v-col>
         </v-row>
         <v-row>
@@ -50,6 +53,7 @@
             <ChannelConfig
               :id="channel.id"
               :color="channel.color"
+              :disabled="!connected"
             />
           </v-col>
         </v-row>
@@ -61,6 +65,10 @@
 <script>
 import ChannelConfig from './components/ChannelConfig';
 import ClockConfig from './components/ClockConfig';
+
+const DEVICE_DISABLED = 0;
+const DEVICE_CONNECTING = 1;
+const DEVICE_CONNECTED = 2;
 
 export default {
   name: 'App',
@@ -97,8 +105,38 @@ export default {
         id: 8,
         color: 'purple',
       },
-    ]
+    ],
+    deviceState: DEVICE_DISABLED,
   }),
+  computed: {
+    connected() {
+      return this.deviceState === this.DEVICE_CONNECTED;
+    },
+    deviceToggle: {
+      get: function () {
+        return this.deviceState !== this.DEVICE_DISABLED;
+      },
+      set: function (val) {
+        if (val) {  // Request to enable.
+          if (this.deviceState == this.DEVICE_DISABLED) {
+            this.deviceState = this.DEVICE_CONNECTING;
+            setTimeout(() => {
+              if (this.deviceState === this.DEVICE_CONNECTING) {
+                this.deviceState = this.DEVICE_CONNECTED;
+              }
+            }, 1000);
+          }
+        } else {  // Request to disable.
+          this.deviceState = this.DEVICE_DISABLED;
+        }
+      }
+    },
+  },
+  created() {
+    this.DEVICE_DISABLED = DEVICE_DISABLED;
+    this.DEVICE_CONNECTING = DEVICE_CONNECTING;
+    this.DEVICE_CONNECTED = DEVICE_CONNECTED;
+  },
 };
 </script>
 

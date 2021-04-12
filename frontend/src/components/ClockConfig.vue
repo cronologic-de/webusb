@@ -1,6 +1,7 @@
 <template>
   <v-card
     outlined
+    :disabled="disabled"
   >
     <v-card-title
       class="grey lighten-3"
@@ -43,5 +44,12 @@
         'µs',
       ],
     }),
+
+    props: {
+      disabled: {
+        type: Boolean,
+        default: false,
+      },
+    },
   }
 </script>
