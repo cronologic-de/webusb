@@ -17,12 +17,15 @@
                 label="Value"
                 type="number"
                 class="no-spinbox"
+                v-model="nanoVal"
+                :rules="nanoRules"
               />
             </v-col>
             <v-col cols="4">
               <v-select
                 :items="clockUnits"
                 label="Unit"
+                v-model="unitVal"
               />
             </v-col>
           </v-row>
@@ -33,22 +36,45 @@
 </template>
 
 <script>
+  const CLOCK_UNITS = [
+    'kHz',
+    'MHz',
+    'ns',
+    'µs',
+  ];
+
   export default {
     name: 'ClockConfig',
 
-    data: () => ({
-      clockUnits: [
-        'kHz',
-        'MHz',
-        'ns',
-        'µs',
-      ],
-    }),
+    data() {
+      return {
+        clockUnits: CLOCK_UNITS,
+        nanoVal: this.nanos,
+        unitVal: this.unit,
+        nanoRules: [
+          (v => !(String(v).match(/-/)) ||
+            'no negative numbers'),
+          (v => !!(String(v).match(/^[0-9.]+$/)) ||
+            'only digits and decimal point allowed'),
+        ],
+      };
+    },
 
     props: {
       disabled: {
         type: Boolean,
         default: false,
+      },
+      nanos: {
+        type: Number,
+        default: 123456789,
+      },
+      unit: {
+        type: String,
+        default: 'ns',
+        validator(val) {
+          return CLOCK_UNITS.indexOf(val) !== -1;
+        },
       },
     },
   }
