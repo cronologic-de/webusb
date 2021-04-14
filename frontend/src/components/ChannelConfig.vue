@@ -11,10 +11,20 @@
     <v-list>
       <v-list-item>
         <v-list-item-content>
-          <v-list-item-title>Multiplier</v-list-item-title>
-          <p class="text-caption text--secondary">
-            Set the number of pulses per clock cycle as a fraction, i.e. <sup>numerator</sup>/<sub>denominator</sub>
-          </p>
+          <v-tooltip bottom>
+            <template v-slot:activator="{ on, attrs }">
+              <v-list-item-title
+                v-bind="attrs"
+                v-on="on"
+              >
+                Multiplier
+                <v-icon>mdi-information</v-icon>
+              </v-list-item-title>
+            </template>
+            <span>
+              Set the number of pulses per clock cycle as a fraction, i.e. <sup>numerator</sup>/<sub>denominator</sub>
+            </span>
+          </v-tooltip>
           <v-row>
             <v-col>
               <v-text-field
