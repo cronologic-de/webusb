@@ -21,6 +21,7 @@
       <v-spacer></v-spacer>
 
       <div class="d-flex align-center">
+        <span class="theme--light v-label mr-4 hidden-sm-and-down">Device Connection</span>
         <v-switch
           append-icon="mdi-usb"
           :color="deviceState === DEVICE_CONNECTING ? 'warning' : 'success'"
