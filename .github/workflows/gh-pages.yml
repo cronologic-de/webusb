@@ -1,10 +1,12 @@
 name: GitHub Pages
 
-# When `main` branch is pushed.
+# When `main` branch is pushed and there are changes in the frontend.
 on:
   push:
     branches:
       - main
+    paths:
+      - 'frontend/**'
 
 jobs:
   deploy:
