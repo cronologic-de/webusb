@@ -17,7 +17,7 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Retrieve latest SDK commit
-        run: git ls-remote https://github.com/raspberrypi/pico-sdk.git master | cut -f 1 > .sdk-master-id
+        run: git ls-remote https://github.com/raspberrypi/pico-sdk.git master | cut -f 1 | tee .sdk-master-id
 
       - name: Cache SDK
         uses: actions/cache@v2
