@@ -6,10 +6,9 @@ This is used by [cronologic GmbH & Co. KG](www.cronologic.de) in the development
 
 ## Project structure
 
-This repository will consist of two parts:
-The MCU firmware and the web frontend to control it.
+This repository consists of two parts:
+The [MCU firmware](firmware) and the [web frontend](frontend) to control it.
 
-Currently, work has not yet started on the firmware, but you can check out the [frontend’s readme](frontend).
 Also, the frontend is automatically deployed at <https://cronologic-de.github.io/webusb/>, feel free to check it out!
 
 ## License

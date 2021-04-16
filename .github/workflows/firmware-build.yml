@@ -1,0 +1,44 @@
+name: Build firmware
+
+# When `main` branch is pushed and there are changes in the firmware.
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'firmware/**'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Cache SDK
+        uses: actions/cache@v2
+        with:
+          path: ~/pico-sdk
+          key: ${{ runner.os }}-pico-sdk-${{ hashFiles('.git/refs/heads/master') }}
+
+      - name: Install toolchain
+        run: sudo apt install -y cmake gcc-arm-none-eabi libnewlib-arm-none-eabi build-essential
+
+      - name: Install SDK
+        run: git clone -b master --recurse-submodules https://github.com/raspberrypi/pico-sdk.git
+
+      - name: Build firmware
+        run: |
+          mkdir build
+          cd build
+          PICO_SDK_PATH=../../pico-sdk cmake ..
+          make -j4
+        working-directory: ./firmware
+
+      - name: Save binaries
+        uses: actions/upload-artifact@v2
+        with:
+          name: firmware
+          path: |
+            firmware/build/*.elf
+            firmware/build/*.uf2
