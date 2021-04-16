@@ -2,6 +2,7 @@ name: Build firmware
 
 # When `main` branch is pushed and there are changes in the firmware.
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
