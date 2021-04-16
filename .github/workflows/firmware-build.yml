@@ -22,14 +22,15 @@ jobs:
       - name: Cache SDK
         uses: actions/cache@v2
         with:
-          path: ~/pico-sdk
-          key: ${{ runner.os }}-pico-sdk-${{ hashFiles('.sdk-master-id') }}
+          path: ./pico-sdk
+          key: ${{ runner.os }}-pico-sdk-repo-${{ hashFiles('.sdk-master-id') }}
 
       - name: Install toolchain
         run: sudo apt install -y cmake gcc-arm-none-eabi libnewlib-arm-none-eabi build-essential
 
       - name: Install SDK
-        run: git clone -b master --recurse-submodules https://github.com/raspberrypi/pico-sdk.git
+        # Don't clone it if the directory already exists (because it has been restored from the cache).
+        run: test -d pico-sdk || git clone -b master --recurse-submodules https://github.com/raspberrypi/pico-sdk.git
 
       - name: Build firmware
         run: |
