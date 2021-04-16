@@ -15,11 +15,14 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: Retrieve latest SDK commit
+        run: git ls-remote https://github.com/raspberrypi/pico-sdk.git master | cut -f 1 > .sdk-master-id
+
       - name: Cache SDK
         uses: actions/cache@v2
         with:
           path: ~/pico-sdk
-          key: ${{ runner.os }}-pico-sdk-${{ hashFiles('.git/refs/heads/master') }}
+          key: ${{ runner.os }}-pico-sdk-${{ hashFiles('.sdk-master-id') }}
 
       - name: Install toolchain
         run: sudo apt install -y cmake gcc-arm-none-eabi libnewlib-arm-none-eabi build-essential
