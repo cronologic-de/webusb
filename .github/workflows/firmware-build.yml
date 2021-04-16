@@ -9,7 +9,7 @@ on:
       - 'firmware/**'
 
 jobs:
-  deploy:
+  build-firmware:
     runs-on: ubuntu-latest
 
     steps:
