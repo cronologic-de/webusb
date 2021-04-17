@@ -20,7 +20,7 @@
 
       <v-spacer></v-spacer>
 
-      <div class="d-flex align-center">
+      <div class="d-flex align-center" v-if="hasUSBSupport">
         <span class="theme--light v-label mr-4 hidden-sm-and-down">Device Connection</span>
         <v-switch
           append-icon="mdi-usb"
@@ -33,6 +33,15 @@
     </v-app-bar>
 
     <v-main class="mt-4">
+      <v-alert
+        v-if="!hasUSBSupport"
+        type="error"
+        class="ma-8"
+      >
+        The browser you are using does not support the <a href="https://web.dev/usb/" target="_blank">WebUSB API</a>.
+        You are therefore unable to use this tool.
+        Please use one of the <a href="https://caniuse.com/webusb" target="_blank">supported browsers</a>, e.g. Chrome&nbsp;≥&nbsp;61, Edge&nbsp;≥&nbsp;79 or Opera&nbsp;≥&nbsp;48.
+      </v-alert>
       <v-container>
         <v-row>
           <v-col
@@ -143,6 +152,7 @@ export default {
         }
       }
     },
+    hasUSBSupport: () => typeof navigator.usb !== 'undefined',
   },
   created() {
     this.DEVICE_DISABLED = DEVICE_DISABLED;
