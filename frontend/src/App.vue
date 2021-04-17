@@ -20,7 +20,7 @@
 
       <v-spacer></v-spacer>
 
-      <div class="d-flex align-center" v-if="hasUSBSupport">
+      <div class="d-flex align-center" v-if="hasSerialSupport">
         <span class="theme--light v-label mr-4 hidden-sm-and-down">Device Connection</span>
         <v-switch
           append-icon="mdi-usb"
@@ -34,13 +34,13 @@
 
     <v-main class="mt-4">
       <v-alert
-        v-if="!hasUSBSupport"
+        v-if="!hasSerialSupport"
         type="error"
         class="ma-8"
       >
-        The browser you are using does not support the <a href="https://web.dev/usb/" target="_blank">WebUSB API</a>.
+        The browser you are using does not support the <a href="https://web.dev/serial/" target="_blank">Web Serial API</a>.
         You are therefore unable to use this tool.
-        Please use one of the <a href="https://caniuse.com/webusb" target="_blank">supported browsers</a>, e.g. Chrome&nbsp;≥&nbsp;61, Edge&nbsp;≥&nbsp;79 or Opera&nbsp;≥&nbsp;48.
+        Please use one of the <a href="https://caniuse.com/mdn-api_serial" target="_blank">supported browsers</a>, e.g. Chrome&nbsp;≥&nbsp;89 or Edge&nbsp;≥&nbsp;89.
       </v-alert>
       <v-container>
         <v-row>
@@ -152,7 +152,7 @@ export default {
         }
       }
     },
-    hasUSBSupport: () => typeof navigator.usb !== 'undefined',
+    hasSerialSupport: () => 'serial' in navigator,
   },
   created() {
     this.DEVICE_DISABLED = DEVICE_DISABLED;
