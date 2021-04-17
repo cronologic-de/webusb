@@ -68,15 +68,6 @@
           </v-col>
         </v-row>
       </v-container>
-
-      <v-snackbar
-        v-model="connectionFakeNotification"
-        :timeout="5000"
-      >
-        <v-icon color="light-blue">mdi-information</v-icon>
-        The “connect” toggle is currently just a mockup.
-        No USB connection is made.
-      </v-snackbar>
     </v-main>
   </v-app>
 </template>
@@ -125,7 +116,7 @@ export default {
         color: 'purple',
       },
     ],
-    connectionFakeNotification: false,
+    device: null,
     deviceState: DEVICE_DISABLED,
   }),
   computed: {
@@ -136,18 +127,35 @@ export default {
       get: function () {
         return this.deviceState !== this.DEVICE_DISABLED;
       },
-      set: function (val) {
+      set: async function (val) {
         if (val) {  // Request to enable.
           if (this.deviceState == this.DEVICE_DISABLED) {
             this.deviceState = this.DEVICE_CONNECTING;
-            this.connectionFakeNotification = true;
-            setTimeout(() => {
-              if (this.deviceState === this.DEVICE_CONNECTING) {
-                this.deviceState = this.DEVICE_CONNECTED;
+            let device;
+            try {
+              device = await navigator.usb.requestDevice({ filters: [{
+                classCode: 0x0a,  // CDC (Serial) device
+              }]});
+            } catch (err) {
+              console.error(err);
+            }
+            if (device === undefined) {
+              this.deviceState = this.DEVICE_DISABLED;
+            } else {
+              console.log('device:', device);
+              this.device = device;
+              this.deviceState = this.DEVICE_CONNECTED;
+              try {
+                console.log('open:', await device.open());
+                console.log('selectConfiguration:', await device.selectConfiguration(1));
+                console.log('claimInterface:', await device.claimInterface(2));
+              } catch (err) {
+                console.error(err);
               }
-            }, 1000);
+            }
           }
         } else {  // Request to disable.
+          this.device = null;
           this.deviceState = this.DEVICE_DISABLED;
         }
       }
