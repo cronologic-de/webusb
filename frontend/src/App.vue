@@ -24,9 +24,9 @@
         <span class="theme--light v-label mr-4 hidden-sm-and-down">Device Connection</span>
         <v-switch
           append-icon="mdi-usb"
-          :color="deviceState === DEVICE_CONNECTING ? 'warning' : 'success'"
+          :color="deviceState === STATE_OPENING ? 'warning' : 'success'"
           hide-details
-          :loading="deviceState === DEVICE_CONNECTING"
+          :loading="deviceState === STATE_OPENING"
           v-model="deviceToggle"
         />
       </div>
@@ -68,15 +68,6 @@
           </v-col>
         </v-row>
       </v-container>
-
-      <v-snackbar
-        v-model="connectionFakeNotification"
-        :timeout="5000"
-      >
-        <v-icon color="light-blue">mdi-information</v-icon>
-        The “connect” toggle is currently just a mockup.
-        No USB connection is made.
-      </v-snackbar>
     </v-main>
   </v-app>
 </template>
@@ -84,10 +75,7 @@
 <script>
 import ChannelConfig from './components/ChannelConfig';
 import ClockConfig from './components/ClockConfig';
-
-const DEVICE_DISABLED = 0;
-const DEVICE_CONNECTING = 1;
-const DEVICE_CONNECTED = 2;
+import { SerialPort, STATE_CLOSED, STATE_OPENING, STATE_OPEN } from './lib/serial';
 
 export default {
   name: 'App',
@@ -125,39 +113,63 @@ export default {
         color: 'purple',
       },
     ],
-    connectionFakeNotification: false,
-    deviceState: DEVICE_DISABLED,
+    device: null,
+    deviceState: STATE_CLOSED,
   }),
   computed: {
     connected() {
-      return this.deviceState === this.DEVICE_CONNECTED;
+      return this.deviceState === STATE_OPEN;
     },
     deviceToggle: {
       get: function () {
-        return this.deviceState !== this.DEVICE_DISABLED;
+        return this.deviceState !== STATE_CLOSED;
       },
-      set: function (val) {
+      set: async function (val) {
         if (val) {  // Request to enable.
-          if (this.deviceState == this.DEVICE_DISABLED) {
-            this.deviceState = this.DEVICE_CONNECTING;
-            this.connectionFakeNotification = true;
-            setTimeout(() => {
-              if (this.deviceState === this.DEVICE_CONNECTING) {
-                this.deviceState = this.DEVICE_CONNECTED;
-              }
-            }, 1000);
+          if (this.deviceState === STATE_CLOSED) {
+            try {
+              // Make sure to set this.device to the promise _before_ awaiting
+              // it, so that this.deviceState may actually be STATE_OPENING.
+              this.device = SerialPort.fromUserSelection();
+              this.updateDeviceState();
+              this.device = await this.device;
+
+              // After a device has been selected, actually open the port and
+              // start reading from it.
+              await this.device.open();
+              this.device.readLoop();
+            } catch (err) {
+              console.log(err);
+              // Opening the device failed, unset this.device again.
+              this.device = undefined;
+            }
+            console.log('device is', this.device);
           }
         } else {  // Request to disable.
-          this.deviceState = this.DEVICE_DISABLED;
+          await this.device.close();
+          this.device = null;
         }
+        this.updateDeviceState();
       }
     },
     hasSerialSupport: () => 'serial' in navigator,
   },
+  methods: {
+    updateDeviceState() {
+      // this.device can be one of three things: An unresolved promise (because
+      // SerialPort.fromUserSelection() is still running), a SerialPort instance
+      // (there's an active connection), or undefined (no connection).
+      if (typeof this.device?.then === 'function') {  // is a promise
+        this.deviceState = STATE_OPENING;
+      } else {
+        this.deviceState = this.device ? this.device.state : STATE_CLOSED;
+      }
+    },
+  },
   created() {
-    this.DEVICE_DISABLED = DEVICE_DISABLED;
-    this.DEVICE_CONNECTING = DEVICE_CONNECTING;
-    this.DEVICE_CONNECTED = DEVICE_CONNECTED;
+    this.STATE_CLOSED = STATE_CLOSED;
+    this.STATE_OPENING = STATE_OPENING;
+    this.STATE_OPEN = STATE_OPEN;
   },
 };
 </script>
