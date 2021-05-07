@@ -15,6 +15,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+        with:
+          submodules: true
 
       - name: Retrieve latest SDK commit
         run: git ls-remote https://github.com/raspberrypi/pico-sdk.git master | cut -f 1 | tee .sdk-master-id
@@ -37,7 +39,7 @@ jobs:
           mkdir build
           cd build
           PICO_SDK_PATH=../../pico-sdk cmake ..
-          make -j4
+          cmake --build . -j
         working-directory: ./firmware
 
       - name: Save binaries

@@ -2,11 +2,17 @@
 #include "pico/stdlib.h"
 #include "hardware/gpio.h"
 #include "pico/binary_info.h"
+#include "scpi/scpi.h"
 
 const uint LED_PIN = 25;
 
+scpi_t scpi_context;
+scpi_command_t scpi_commands[] = {
+	{ .pattern = "*IDN?", .callback = SCPI_CoreIdnQ, },
+};
+
 int main() {
-	bi_decl(bi_program_description("This is a test binary."));
+	bi_decl(bi_program_description("This is a test binary, including the SCPI library."));
 	bi_decl(bi_1pin_with_name(LED_PIN, "On-board LED"));
 
 	stdio_init_all();
