@@ -45,7 +45,6 @@ scpi_interface_t scpi_interface = {
 
 int main() {
 	bi_decl(bi_program_description("This is a test binary, including the SCPI library."));
-	bi_decl(bi_1pin_with_name(LED_PIN, "On-board LED"));
 
 	stdio_init_all();
 
