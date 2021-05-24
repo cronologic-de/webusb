@@ -79,10 +79,12 @@
 </template>
 
 <script>
+  // Returns a validation rule for a given maximum string length.
   function maxLength(max) {
     return (v => String(v).length <= max || `${max} digit${max===1?'':'s'} max`);
   }
 
+  // Returns a validation rule for a given number of maximum fractional digits.
   function maxFrac(max) {
     return v => {
       v = String(v).split('.', 2);
@@ -93,6 +95,7 @@
     }
   }
 
+  // Validation rule: Has to be a positive integer not equal to zero.
   function posIntNot0(v) {
     if (!(String(v).match(/^[0-9]+$/))) {
       return 'only positive integers';
@@ -103,6 +106,7 @@
     return true;
   }
 
+  // Validation rule: Has to be a positive floating point number (including 0).
   function posFloat(v) {
     return !!(String(v).match(/^[0-9.]+$/)) || 'only positive numbers';
   }
@@ -112,10 +116,13 @@
 
     data() {
       return {
+        // Channel configuration values.
         num: this.numerator,
         denom: this.denominator,
         phase_ns: this.phase,
         width_ns: this.width,
+
+        // Validation rules.
         num_rules: [ posIntNot0, maxLength(2) ],
         denom_rules: [ posIntNot0, maxLength(1) ],
         phase_rules: [

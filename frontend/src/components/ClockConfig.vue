@@ -36,6 +36,7 @@
 </template>
 
 <script>
+  // All allowed units for the dropdown.
   const CLOCK_UNITS = [
     'kHz',
     'MHz',
@@ -49,8 +50,12 @@
     data() {
       return {
         clockUnits: CLOCK_UNITS,
+
+        // Configuration values.
         nanoVal: this.nanos,
         unitVal: this.unit,
+
+        // Validation rules.
         nanoRules: [
           (v => !(String(v).match(/-/)) ||
             'no negative numbers'),
@@ -73,6 +78,7 @@
         type: String,
         default: 'ns',
         validator(val) {
+          // The value must be contained in the CLOCK_UNITS array.
           return CLOCK_UNITS.indexOf(val) !== -1;
         },
       },

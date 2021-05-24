@@ -86,6 +86,8 @@ export default {
   },
 
   data: () => ({
+    // Should at some point hold the configuration for each channel.
+    // For now, it only specifies which channels exist and what their colors are.
     channelConfig: [
       {
         id: 1,
@@ -113,13 +115,22 @@ export default {
         color: 'purple',
       },
     ],
+    // This can be one of three things: An unresolved promise (because
+    // SerialPort.fromUserSelection() is still running), a SerialPort instance
+    // (there's an active connection), or undefined (no connection).
     device: null,
+    // deviceState can basically be derived from this.device, but for some
+    // reason the reactiveness didn't work, else it would've been a computed
+    // property. As a workaround, it will be updated manually from
+    // this.updateDeviceState().
     deviceState: STATE_CLOSED,
   }),
   computed: {
+    // Whether we are successfully connected to a device.
     connected() {
       return this.deviceState === STATE_OPEN;
     },
+    // Used by the connection toggle switch in the upper right hand corner.
     deviceToggle: {
       get: function () {
         return this.deviceState !== STATE_CLOSED;
@@ -152,13 +163,12 @@ export default {
         this.updateDeviceState();
       }
     },
+    // Whether the browser supports USB Serial.
     hasSerialSupport: () => 'serial' in navigator,
   },
   methods: {
+    // See the description of the deviceState property.
     updateDeviceState() {
-      // this.device can be one of three things: An unresolved promise (because
-      // SerialPort.fromUserSelection() is still running), a SerialPort instance
-      // (there's an active connection), or undefined (no connection).
       if (typeof this.device?.then === 'function') {  // is a promise
         this.deviceState = STATE_OPENING;
       } else {
@@ -167,6 +177,7 @@ export default {
     },
   },
   created() {
+    // Make the serial library's constants available on `this`.
     this.STATE_CLOSED = STATE_CLOSED;
     this.STATE_OPENING = STATE_OPENING;
     this.STATE_OPEN = STATE_OPEN;
@@ -180,6 +191,7 @@ export default {
   background-repeat: repeat;
 }
 
+// Hide spinboxes on <input type="number"> fields, if requested by .no-spinbox.
 .no-spinbox input[type="number"] {
   -moz-appearance: textfield;
   &::-webkit-outer-spin-button,

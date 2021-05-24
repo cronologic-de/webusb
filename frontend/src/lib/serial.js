@@ -12,6 +12,10 @@ function log() {
 }
 
 class SerialPort extends EventTarget {
+    // Extends EventTarget so that we can provide events on new lines coming in
+    // (not implemented yet).
+
+    // Create a SerialPort instance by interactive selection using the browser UI.
     static async fromUserSelection() {
         log("SerialPort.fromUserSelection()");
         const port = await navigator.serial.requestPort();
@@ -19,6 +23,8 @@ class SerialPort extends EventTarget {
         return new SerialPort(port);
     }
 
+    // Create a new SerialPort instance based on a browser API instance of a port.
+    // You still need to call .open() and probably .readLoop() afterwards.
     constructor(webSerialPort) {
         super();
         this._reset();
@@ -28,6 +34,7 @@ class SerialPort extends EventTarget {
         log("Created new SerialPort:", this);
     }
 
+    // Reset the instance to its initial state.
     _reset() {
         this.port = null;
         this.state = STATE_CLOSED;
@@ -35,6 +42,7 @@ class SerialPort extends EventTarget {
         this.readableStreamClosed = null;
     }
 
+    // Open the port.
     async open() {
         log("open() called on", this);
         this.state = STATE_OPENING;
@@ -53,6 +61,7 @@ class SerialPort extends EventTarget {
         log("Port is now open.");
     }
 
+    // Close the port.
     async close() {
         log("close() called on", this);
         this.state = STATE_CLOSING;
@@ -65,6 +74,7 @@ class SerialPort extends EventTarget {
         log("Port is now closed.");
     }
 
+    // Called when the browser signals that the device has gone away.
     disconnectHandler(ev) {
         if (ev.target !== this.port) {
             return;
@@ -74,12 +84,20 @@ class SerialPort extends EventTarget {
         this._reset();
     }
 
+    // Read chunks from the serial device indefinitely. Right now, they are
+    // displayed via console.log(); in the future, triggering an event should be
+    // the way to go.
     async readLoop() {
+        // Wait in the background for a chunk to come in.
         const { value, done } = await this.reader.read();
+
         if (done) {
+            // There's nothing left to read, stop trying.
             this.reader.releaseLock();
             return;
         }
+
+        // Output the chunk and call the function again after leaving it.
         console.log('read:', value, this.state);
         setTimeout(this.readLoop, 1);
     }
